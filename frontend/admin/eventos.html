@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia UBA - Eventos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --azul-rey: #1a237e;
+            --azul-medio: #283593;
+            --azul-claro: #e8eaf6;
+            --amarillo: #fdd835;
+            --sidebar-width: 240px;
+        }
+
+        body { font-family: 'Poppins', sans-serif; background: #f5f6fa; min-height: 100vh; display: flex; }
+
+        .sidebar { width: var(--sidebar-width); background: var(--azul-rey); min-height: 100vh; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; }
+        .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px; }
+        .sidebar-logo img { width: 40px; height: 40px; object-fit: contain; background: white; border-radius: 50%; padding: 4px; }
+        .sidebar-logo-text h2 { color: white; font-size: 15px; font-weight: 600; }
+        .sidebar-logo-text p { color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 300; }
+        .sidebar-menu { padding: 16px 0; flex: 1; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; transition: all 0.2s ease; }
+        .menu-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .menu-item.activo { background: rgba(255,255,255,0.15); color: white; border-left: 3px solid var(--amarillo); }
+        .menu-item .icono { font-size: 18px; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .admin-info { color: rgba(255,255,255,0.7); font-size: 12px; margin-bottom: 12px; }
+        .admin-info strong { display: block; color: white; font-size: 13px; }
+        .btn-cerrar { background: rgba(255,255,255,0.1); border: none; border-radius: 8px; padding: 8px 16px; color: white; font-family: 'Poppins', sans-serif; font-size: 12px; cursor: pointer; width: 100%; transition: all 0.2s ease; }
+        .btn-cerrar:hover { background: rgba(255,255,255,0.2); }
+        .main { margin-left: var(--sidebar-width); flex: 1; padding: 32px; }
+
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .page-header h1 { font-family: 'Playfair Display', serif; color: var(--azul-rey); font-size: 28px; }
+        .page-header p { color: #888; font-size: 14px; font-weight: 300; }
+
+        .btn-nuevo { background: var(--azul-rey); color: white; border: none; border-radius: 12px; padding: 12px 24px; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        .btn-nuevo:hover { background: var(--azul-medio); transform: translateY(-1px); }
+
+        .filtros { background: white; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-filtro { border: 2px solid #e8eaf6; background: white; border-radius: 20px; padding: 6px 16px; font-family: 'Poppins', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s ease; color: #666; }
+        .btn-filtro.activo { background: var(--azul-rey); color: white; border-color: var(--azul-rey); }
+        .btn-filtro:hover { border-color: var(--azul-rey); color: var(--azul-rey); }
+
+        .eventos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+
+        .evento-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-left: 4px solid #e0e0e0; transition: all 0.2s ease; }
+        .evento-card.activo { border-left-color: #4caf50; }
+        .evento-card.inactivo { border-left-color: #e0e0e0; }
+        .evento-card.finalizado { border-left-color: #90caf9; }
+        .evento-card.reprogramado { border-left-color: #ffb74d; }
+        .evento-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+        .evento-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .evento-codigo { font-size: 12px; color: #888; font-weight: 300; margin-bottom: 4px; }
+        .evento-nombre { color: var(--azul-rey); font-size: 16px; font-weight: 600; }
+
+        .badge-estado { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+        .badge-activo { background: #e8f5e9; color: #2e7d32; }
+        .badge-inactivo { background: #f5f5f5; color: #757575; }
+        .badge-finalizado { background: #e3f2fd; color: #1565c0; }
+        .badge-reprogramado { background: #fff3e0; color: #e65100; }
+
+        .evento-detalle { color: #666; font-size: 13px; font-weight: 300; margin-bottom: 6px; }
+        .evento-botones { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+        .btn-accion { border: none; border-radius: 8px; padding: 8px 16px; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        .btn-activar { background: #e8f5e9; color: #2e7d32; }
+        .btn-activar:hover { background: #c8e6c9; }
+        .btn-finalizar { background: #ffebee; color: #c62828; }
+        .btn-finalizar:hover { background: #ffcdd2; }
+        .btn-reprogramar { background: #fff3e0; color: #e65100; }
+        .btn-reprogramar:hover { background: #ffe0b2; }
+        .btn-editar { background: #e8eaf6; color: var(--azul-rey); }
+        .btn-editar:hover { background: #c5cae9; }
+        .btn-qr { background: #e8f5e9; color: #1b5e20; }
+        .btn-qr:hover { background: #c8e6c9; }
+        .btn-reabrir { background: #f3e5f5; color: #6a1b9a; }
+        .btn-reabrir:hover { background: #e1bee7; }
+
+        .empty-state { text-align: center; padding: 64px; color: #aaa; grid-column: 1 / -1; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.activo { display: flex; }
+        .modal { background: white; border-radius: 20px; padding: 32px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,0.3); }
+        .modal h2 { font-family: 'Playfair Display', serif; color: var(--azul-rey); font-size: 22px; margin-bottom: 8px; }
+        .modal-subtitulo { color: #888; font-size: 13px; margin-bottom: 24px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; color: var(--azul-rey); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px 16px; border: 2px solid #e8eaf6; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px; color: #333; outline: none; transition: border-color 0.2s ease; }
+        .form-group input:disabled { background: #f5f5f5; color: #999; cursor: not-allowed; }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--azul-rey); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .advertencia { background: #fff3e0; border: 1px solid #ffcc02; border-radius: 10px; padding: 12px 16px; color: #e65100; font-size: 13px; margin-bottom: 16px; display: none; }
+        .modal-botones { display: flex; gap: 12px; margin-top: 24px; }
+        .btn-guardar { background: var(--azul-rey); color: white; border: none; border-radius: 10px; padding: 12px 24px; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; flex: 1; transition: all 0.2s ease; }
+        .btn-guardar:hover { background: var(--azul-medio); }
+        .btn-cancelar { background: #f5f5f5; color: #666; border: none; border-radius: 10px; padding: 12px 24px; font-family: 'Poppins', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.2s ease; }
+        .btn-cancelar:hover { background: #eee; }
+
+        .qr-container { text-align: center; padding: 16px 0; }
+        .qr-container p { color: #666; font-size: 13px; margin-top: 16px; font-weight: 300; }
+        .qr-url { background: #f5f6fa; border-radius: 10px; padding: 10px 16px; font-size: 12px; color: var(--azul-rey); font-weight: 600; margin-top: 8px; word-break: break-all; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <img src="../img/logo_uba.png" alt="UBA">
+            <div class="sidebar-logo-text">
+                <h2>Trivia UBA</h2>
+                <p>Panel Admin</p>
+            </div>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item"><span class="icono">🏠</span> Dashboard</a>
+            <a href="preguntas.html" class="menu-item"><span class="icono">❓</span> Preguntas</a>
+            <a href="eventos.html" class="menu-item activo"><span class="icono">📅</span> Eventos</a>
+            <a href="reportes.html" class="menu-item"><span class="icono">📊</span> Reportes</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="admin-info">
+                <strong id="admin-nombre">Cargando...</strong>
+                Administrador
+            </div>
+            <button class="btn-cerrar" onclick="cerrarSesion()">Cerrar sesión</button>
+        </div>
+    </div>
+
+    <main class="main">
+        <div class="page-header">
+            <div>
+                <h1>Gestión de Eventos</h1>
+                <p>Crea y administra los eventos de trivia</p>
+            </div>
+            <button class="btn-nuevo" onclick="abrirModalNuevo()">+ Nuevo Evento</button>
+        </div>
+
+        <div class="filtros">
+            <button class="btn-filtro activo" onclick="filtrar('Todos', this)">Todos</button>
+            <button class="btn-filtro" onclick="filtrar('Activo', this)">✅ Activos</button>
+            <button class="btn-filtro" onclick="filtrar('Inactivo', this)">⏸ Inactivos</button>
+            <button class="btn-filtro" onclick="filtrar('Reprogramado', this)">🔄 Reprogramados</button>
+            <button class="btn-filtro" onclick="filtrar('Finalizado', this)">🏁 Finalizados</button>
+        </div>
+
+        <div class="eventos-grid" id="eventos-grid">
+            <div class="empty-state">⏳ Cargando eventos...</div>
+        </div>
+    </main>
+
+    <!-- Modal nuevo/editar -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <h2 id="modal-titulo">Nuevo Evento</h2>
+            <p class="modal-subtitulo" id="modal-subtitulo"></p>
+            <div class="advertencia" id="advertencia-estado"></div>
+            <div class="form-group">
+                <label>Código del evento</label>
+                <input type="text" id="input-codigo" placeholder="Ej: ABEP-2026-1">
+            </div>
+            <div class="form-group">
+                <label>Nombre del evento</label>
+                <input type="text" id="input-nombre" placeholder="Ej: Salón ABEP 2026">
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="input-descripcion" placeholder="Descripción del evento..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Ubicación</label>
+                <input type="text" id="input-ubicacion" placeholder="Ej: Sede Principal UBA">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Fecha inicio</label>
+                    <input type="date" id="input-fecha-inicio">
+                </div>
+                <div class="form-group">
+                    <label>Fecha fin</label>
+                    <input type="date" id="input-fecha-fin">
+                </div>
+            </div>
+            <div class="modal-botones">
+                <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-guardar" id="btn-guardar" onclick="guardarEvento()">Guardar Evento</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal reprogramar -->
+    <div class="modal-overlay" id="modal-reprogramar">
+        <div class="modal">
+            <h2>Reprogramar Evento</h2>
+            <p class="modal-subtitulo" id="reprogramar-nombre"></p>
+            <div class="advertencia" style="display:block;">
+                🔄 El evento cambiará a estado "Reprogramado" con las nuevas fechas.
+            </div>
+            <div class="form-group">
+                <label>Descripción actualizada</label>
+                <textarea id="reprogramar-descripcion" placeholder="Explica el motivo o cambios..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nueva fecha inicio</label>
+                    <input type="date" id="reprogramar-fecha-inicio">
+                </div>
+                <div class="form-group">
+                    <label>Nueva fecha fin</label>
+                    <input type="date" id="reprogramar-fecha-fin">
+                </div>
+            </div>
+            <div class="modal-botones">
+                <button class="btn-cancelar" onclick="cerrarReprogramar()">Cancelar</button>
+                <button class="btn-guardar" onclick="confirmarReprogramar()">Reprogramar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal QR -->
+    <div class="modal-overlay" id="modal-qr">
+        <div class="modal" style="max-width: 380px; text-align: center;">
+            <h2>Código QR del Evento</h2>
+            <p style="color:#888; font-size:13px; margin-bottom:24px;">
+                Los participantes escanean este código para acceder a la trivia
+            </p>
+            <div class="qr-container">
+                <div id="qr-code" style="display:flex; justify-content:center;"></div>
+                <p>Escanea con la cámara del celular</p>
+                <div class="qr-url" id="qr-url"></div>
+            </div>
+            <div class="modal-botones" style="margin-top:24px; flex-direction:column; gap:10px;">
+                <button class="btn-guardar" onclick="descargarQR()" style="width:100%;">📥 Descargar QR como PDF</button>
+                <button class="btn-cancelar" onclick="cerrarQR()" style="width:100%;">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template oculto para la ventana de impresión del QR -->
+    <template id="template-qr-pdf">
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>QR Trivia UBA</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: Arial, sans-serif; background: white; padding: 40px; }
+                .titulo { color: #1a237e; font-size: 20px; font-weight: bold; margin-bottom: 6px; text-align: center; }
+                .subtitulo { color: #555; font-size: 13px; margin-bottom: 28px; text-align: center; }
+                .qr-img { width: 260px; height: 260px; border: 6px solid #1a237e; border-radius: 12px; padding: 8px; }
+                .url-box { margin-top: 20px; background: #e8eaf6; border-radius: 10px; padding: 10px 20px; color: #1a237e; font-size: 13px; font-weight: bold; word-break: break-all; text-align: center; max-width: 300px; }
+                .footer { margin-top: 24px; color: #aaa; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+            </style>
+        </head>
+        <body>
+            <p class="titulo">Trivia UBA</p>
+            <p class="subtitulo">Dirección de Postgrado — Escanea para participar</p>
+            <img class="qr-img" id="tpl-img" src="" />
+            <div class="url-box" id="tpl-url"></div>
+            <p class="footer">Universidad Bicentenaria de Aragua</p>
+        </body>
+        </html>
+    </template>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        protegerPagina();
+        const admin = obtenerAdmin();
+        if (admin) document.getElementById('admin-nombre').textContent = admin.nombre;
+
+        const URL_APP = CONFIG.BASE_URL.replace(':3000/api', ':5500/frontend/index.html');
+
+        let eventoEditandoId = null;
+        let eventoReprogramandoId = null;
+        let todosLosEventos = [];
+
+        async function cargarEventos() {
+            const data = await apiEventos.obtenerTodos();
+            if (!data.success) return;
+            todosLosEventos = data.data;
+            renderizarEventos(todosLosEventos);
+        }
+
+        function filtrar(estado, btn) {
+            document.querySelectorAll('.btn-filtro').forEach(function(b) { b.classList.remove('activo'); });
+            btn.classList.add('activo');
+            const filtrados = estado === 'Todos'
+                ? todosLosEventos
+                : todosLosEventos.filter(function(e) { return e.estado === estado; });
+            renderizarEventos(filtrados);
+        }
+
+        function renderizarEventos(eventos) {
+            const grid = document.getElementById('eventos-grid');
+            if (eventos.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><p>📭 No hay eventos registrados</p></div>';
+                return;
+            }
+            grid.innerHTML = eventos.map(function(evento) {
+                return '<div class="evento-card ' + evento.estado.toLowerCase() + '">' +
+                    '<div class="evento-header">' +
+                        '<div>' +
+                            '<p class="evento-codigo">' + evento.codigo + '</p>' +
+                            '<h3 class="evento-nombre">' + evento.nombre + '</h3>' +
+                        '</div>' +
+                        '<span class="badge-estado badge-' + evento.estado.toLowerCase() + '">' + evento.estado + '</span>' +
+                    '</div>' +
+                    '<p class="evento-detalle">📍 ' + (evento.ubicacion || 'Sin ubicación') + '</p>' +
+                    '<p class="evento-detalle">📅 ' + formatearFecha(evento.fecha_inicio) + ' → ' + formatearFecha(evento.fecha_fin) + '</p>' +
+                    '<p class="evento-detalle">📝 ' + (evento.descripcion || 'Sin descripción') + '</p>' +
+                    '<div class="evento-botones">' +
+                        '<button class="btn-accion btn-editar" onclick="abrirModalEditar(' + evento.id + ')">✏️ Editar</button>' +
+                        (evento.estado !== 'Finalizado' ? '<button class="btn-accion btn-reprogramar" onclick="abrirModalReprogramar(' + evento.id + ', \'' + evento.nombre + '\')">🔄 Reprogramar</button>' : '') +
+                        (evento.estado !== 'Activo' && evento.estado !== 'Finalizado' ? '<button class="btn-accion btn-activar" onclick="activarEvento(' + evento.id + ')">✅ Activar</button>' : '') +
+                        (evento.estado === 'Finalizado' ? '<button class="btn-accion btn-reabrir" onclick="reabrirEvento(' + evento.id + ', \'' + evento.nombre + '\')">🔓 Reabrir</button>' : '') +
+                        (evento.estado === 'Activo' || evento.estado === 'Reprogramado' ? '<button class="btn-accion btn-finalizar" onclick="finalizarEvento(' + evento.id + ')">🏁 Finalizar</button>' : '') +
+                        (evento.estado === 'Activo' ? '<button class="btn-accion btn-qr" onclick="verQR(\'' + evento.codigo + '\')">📱 Ver QR</button>' : '') +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        function formatearFecha(fecha) {
+            if (!fecha) return 'Sin fecha';
+            return new Date(fecha).toLocaleDateString('es-VE', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+        }
+
+        function abrirModalNuevo() {
+            eventoEditandoId = null;
+            document.getElementById('modal-titulo').textContent = 'Nuevo Evento';
+            document.getElementById('modal-subtitulo').textContent = '';
+            document.getElementById('advertencia-estado').style.display = 'none';
+            document.getElementById('input-codigo').disabled = false;
+            document.getElementById('input-codigo').value = '';
+            document.getElementById('input-nombre').value = '';
+            document.getElementById('input-descripcion').value = '';
+            document.getElementById('input-ubicacion').value = '';
+            document.getElementById('input-fecha-inicio').value = '';
+            document.getElementById('input-fecha-fin').value = '';
+            document.getElementById('btn-guardar').textContent = 'Guardar Evento';
+            document.getElementById('modal-overlay').classList.add('activo');
+        }
+
+        function abrirModalEditar(id) {
+            const evento = todosLosEventos.find(function(e) { return e.id === id; });
+            if (!evento) return;
+
+            eventoEditandoId = id;
+            document.getElementById('modal-titulo').textContent = 'Editar Evento';
+            document.getElementById('modal-subtitulo').textContent = 'Código: ' + evento.codigo;
+            document.getElementById('input-codigo').value = evento.codigo;
+            document.getElementById('input-codigo').disabled = true;
+            document.getElementById('input-nombre').value = evento.nombre;
+            document.getElementById('input-descripcion').value = evento.descripcion || '';
+            document.getElementById('input-ubicacion').value = evento.ubicacion || '';
+            document.getElementById('input-fecha-inicio').value = evento.fecha_inicio ? evento.fecha_inicio.split('T')[0] : '';
+            document.getElementById('input-fecha-fin').value = evento.fecha_fin ? evento.fecha_fin.split('T')[0] : '';
+            document.getElementById('btn-guardar').textContent = 'Guardar Cambios';
+
+            if (evento.estado === 'Activo' || evento.estado === 'Finalizado') {
+                document.getElementById('advertencia-estado').style.display = 'block';
+                document.getElementById('advertencia-estado').textContent =
+                    '⚠️ Este evento está ' + evento.estado + '. Los cambios no afectarán participaciones ya registradas.';
+            } else {
+                document.getElementById('advertencia-estado').style.display = 'none';
+            }
+
+            document.getElementById('modal-overlay').classList.add('activo');
+        }
+
+        function abrirModalReprogramar(id, nombre) {
+            eventoReprogramandoId = id;
+            document.getElementById('reprogramar-nombre').textContent = nombre;
+            document.getElementById('reprogramar-descripcion').value = '';
+            document.getElementById('reprogramar-fecha-inicio').value = '';
+            document.getElementById('reprogramar-fecha-fin').value = '';
+            document.getElementById('modal-reprogramar').classList.add('activo');
+        }
+
+        function cerrarModal() { document.getElementById('modal-overlay').classList.remove('activo'); }
+        function cerrarReprogramar() { document.getElementById('modal-reprogramar').classList.remove('activo'); }
+
+        async function guardarEvento() {
+            const datos = {
+                codigo: document.getElementById('input-codigo').value,
+                nombre: document.getElementById('input-nombre').value,
+                descripcion: document.getElementById('input-descripcion').value,
+                ubicacion: document.getElementById('input-ubicacion').value,
+                fecha_inicio: document.getElementById('input-fecha-inicio').value,
+                fecha_fin: document.getElementById('input-fecha-fin').value
+            };
+
+            if (!datos.nombre || !datos.fecha_inicio || !datos.fecha_fin) {
+                alert('Por favor completa los campos obligatorios: nombre y fechas');
+                return;
+            }
+
+            let data;
+            if (eventoEditandoId) {
+                data = await apiEventos.editar(eventoEditandoId, datos);
+            } else {
+                if (!datos.codigo) { alert('El código del evento es obligatorio'); return; }
+                data = await apiEventos.crear(datos);
+            }
+
+            if (data.success) { cerrarModal(); cargarEventos(); }
+            else alert('Error: ' + data.mensaje);
+        }
+
+        async function confirmarReprogramar() {
+            const fecha_inicio = document.getElementById('reprogramar-fecha-inicio').value;
+            const fecha_fin = document.getElementById('reprogramar-fecha-fin').value;
+            const descripcion = document.getElementById('reprogramar-descripcion').value;
+
+            if (!fecha_inicio || !fecha_fin) { alert('Por favor ingresa las nuevas fechas'); return; }
+
+            const data = await apiCall('/eventos/reprogramar/' + eventoReprogramandoId, 'PUT', {
+                fecha_inicio: fecha_inicio, fecha_fin: fecha_fin, descripcion: descripcion
+            });
+
+            if (data.success) { cerrarReprogramar(); cargarEventos(); }
+            else alert('Error: ' + data.mensaje);
+        }
+
+        async function activarEvento(id) {
+            if (!confirm('¿Activar este evento? El evento activo actual pasará a Inactivo.')) return;
+            const data = await apiEventos.activar(id);
+            if (data.success) cargarEventos();
+            else alert('Error: ' + data.mensaje);
+        }
+
+        async function finalizarEvento(id) {
+            if (!confirm('¿Finalizar este evento? No podrá recibir más participaciones.')) return;
+            const data = await apiEventos.finalizar(id);
+            if (data.success) cargarEventos();
+            else alert('Error: ' + data.mensaje);
+        }
+
+        async function reabrirEvento(id, nombre) {
+            if (!confirm('¿Reabrir el evento "' + nombre + '"?\nCambiará a Inactivo y podrás activarlo nuevamente.')) return;
+            const data = await apiEventos.reabrir(id);
+            if (data.success) cargarEventos();
+            else alert('Error: ' + data.mensaje);
+        }
+
+        function verQR(codigo) {
+            const urlEvento = URL_APP + '?evento=' + codigo;
+            document.getElementById('qr-url').textContent = urlEvento;
+            document.getElementById('qr-code').innerHTML = '';
+            new QRCode(document.getElementById('qr-code'), {
+                text: urlEvento,
+                width: 200,
+                height: 200,
+                colorDark: '#1a237e',
+                colorLight: '#ffffff',
+            });
+            document.getElementById('modal-qr').classList.add('activo');
+        }
+
+        function cerrarQR() { document.getElementById('modal-qr').classList.remove('activo'); }
+
+        function descargarQR() {
+            const canvas = document.querySelector('#qr-code canvas');
+            if (!canvas) { alert('El QR aún no se ha generado.'); return; }
+
+            const url = document.getElementById('qr-url').textContent;
+            const imgData = canvas.toDataURL('image/png');
+
+            const tpl = document.getElementById('template-qr-pdf').innerHTML;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(tpl, 'text/html');
+            doc.getElementById('tpl-img').src = imgData;
+            doc.getElementById('tpl-url').textContent = url;
+
+            const ventana = window.open('', '_blank');
+            ventana.document.write(doc.documentElement.outerHTML);
+            ventana.document.close();
+            setTimeout(function() { ventana.print(); }, 500);
+        }
+
+        cargarEventos();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Trivia UBA - Resultado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --azul-rey: #1a237e;
+            --amarillo: #fdd835;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            min-height: 100dvh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .collage {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            z-index: 1;
+        }
+
+        .collage-foto { background-size: cover; background-position: center; }
+        .collage-foto:nth-child(1) { background-image: url('img/foto4.jpg'); }
+        .collage-foto:nth-child(2) { background-image: url('img/foto1.jpg'); }
+        .collage-foto:nth-child(3) { background-image: url('img/foto6.jpg'); }
+        .collage-foto:nth-child(4) { background-image: url('img/foto2.jpg'); }
+        .collage-foto:nth-child(5) { background-image: url('img/foto7.jpg'); }
+        .collage-foto:nth-child(6) { background-image: url('img/foto3.jpg'); }
+        .collage-foto:nth-child(7) { background-image: url('img/foto5.jpg'); }
+        .collage-foto:nth-child(8) { background-image: url('img/foto6.jpg'); }
+        .collage-foto:nth-child(9) { background-image: url('img/foto1.jpg'); }
+
+        .filtro {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(160deg,
+                rgba(26, 35, 126, 0.88) 0%,
+                rgba(40, 53, 147, 0.78) 50%,
+                rgba(26, 35, 126, 0.92) 100%
+            );
+            z-index: 2;
+        }
+
+        .contenido {
+            position: relative;
+            z-index: 3;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 28px 24px;
+            max-width: 430px;
+            margin: 0 auto;
+            gap: 20px;
+        }
+
+        .logo-pequeno {
+            background: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+            animation: fadeDown 0.6s ease forwards;
+        }
+
+        .logo-pequeno img { width: 100%; height: 100%; object-fit: contain; }
+
+        .icono-resultado {
+            font-size: 64px;
+            text-align: center;
+            animation: bounceIn 0.8s ease 0.2s both;
+        }
+
+        .resultado-card {
+            background: rgba(255,255,255,0.97);
+            border-radius: 24px;
+            padding: 24px 20px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+            animation: fadeUp 0.6s ease 0.3s both;
+        }
+
+        .resultado-card.ganador { border-top: 5px solid #4caf50; }
+        .resultado-card.cercano { border-top: 5px solid var(--amarillo); }
+        .resultado-card.animo { border-top: 5px solid #90caf9; }
+
+        .puntaje {
+            font-family: 'Playfair Display', serif;
+            font-size: 44px;
+            color: var(--azul-rey);
+            margin-bottom: 4px;
+        }
+
+        .puntaje-label {
+            color: #888;
+            font-size: 11px;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+
+        .mensaje-titulo {
+            color: var(--azul-rey);
+            font-size: 17px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .mensaje-texto {
+            color: #555;
+            font-size: 13px;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .botones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            animation: fadeUp 0.6s ease 0.4s both;
+        }
+
+        .btn-finalizar {
+            background: var(--amarillo);
+            color: var(--azul-rey);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 0;
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(253,216,53,0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-finalizar:hover { transform: translateY(-2px); }
+        .btn-finalizar:active { transform: scale(0.97); }
+
+        .btn-intentar {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 50px;
+            padding: 13px 0;
+            width: 100%;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-intentar:hover { background: rgba(255,255,255,0.1); border-color: white; }
+
+        .btn-reglas {
+            background: transparent;
+            border: 1px solid rgba(253,216,53,0.6);
+            border-radius: 50px;
+            padding: 13px 0;
+            width: 100%;
+            color: var(--amarillo);
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-reglas:hover { background: rgba(253,216,53,0.1); border-color: var(--amarillo); }
+        .btn-reglas:active { transform: scale(0.97); }
+
+        .footer {
+            color: rgba(255,255,255,0.4);
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            animation: fadeUp 0.6s ease 0.5s both;
+        }
+
+        @media (max-height: 700px) {
+            .contenido { gap: 14px; padding: 20px; }
+            .logo-pequeno { width: 48px; height: 48px; }
+            .icono-resultado { font-size: 48px; }
+            .puntaje { font-size: 36px; }
+            .resultado-card { padding: 18px 16px; }
+            .mensaje-titulo { font-size: 15px; }
+        }
+
+        @media (max-height: 580px) {
+            .logo-pequeno { display: none; }
+            .icono-resultado { font-size: 40px; }
+            .contenido { gap: 10px; }
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { transform: scale(1.1); }
+            70% { transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="collage">
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+    </div>
+
+    <div class="filtro"></div>
+
+    <div class="contenido">
+        <div class="logo-pequeno">
+            <img src="img/logo_uba.png" alt="Logo UBA">
+        </div>
+
+        <div id="icono-resultado" class="icono-resultado"></div>
+
+        <div id="resultado-card" class="resultado-card">
+            <p class="puntaje" id="puntaje"></p>
+            <p class="puntaje-label">respuestas correctas</p>
+            <h2 class="mensaje-titulo" id="mensaje-titulo"></h2>
+            <p class="mensaje-texto" id="mensaje-texto"></p>
+        </div>
+
+        <div class="botones">
+            <button class="btn-finalizar" onclick="finalizar()">Finalizar</button>
+            <button class="btn-intentar" onclick="intentarNuevamente()">Intentar nuevamente</button>
+
+        </div>
+
+        <p class="footer">Dirección de Postgrado UBA</p>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+const correctas = parseInt(sessionStorage.getItem('correctas'));
+        const incorrectas = parseInt(sessionStorage.getItem('incorrectas'));
+        const perfil = sessionStorage.getItem('perfil');
+
+        if (isNaN(correctas)) window.location.href = 'index.html';
+
+        document.getElementById('puntaje').textContent = `${correctas}/2`;
+
+        const card = document.getElementById('resultado-card');
+        const icono = document.getElementById('icono-resultado');
+        const titulo = document.getElementById('mensaje-titulo');
+        const texto = document.getElementById('mensaje-texto');
+
+        if (correctas === 2) {
+            card.classList.add('ganador');
+            icono.textContent = '🏆';
+            titulo.textContent = '¡Felicitaciones!';
+            texto.textContent = 'Pasa retirando tu premio por el Stand de Postgrado.';
+        } else if (correctas === 1) {
+            card.classList.add('cercano');
+            icono.textContent = '⭐';
+            titulo.textContent = '¡Estuviste muy cerca de llevarte el premio!';
+            texto.textContent = 'Inténtalo más tarde, tú puedes lograrlo.';
+        } else {
+            card.classList.add('animo');
+            if (perfil === 'Estudiante' || perfil === 'Profesor') {
+                icono.textContent = '📚';
+                titulo.textContent = '¡Sigue aprendiendo!';
+                texto.textContent = 'Te invitamos a estudiar con mayor detalle las líneas de investigación de la UBA.';
+            } else {
+                icono.textContent = '🏛️';
+                titulo.textContent = '¡Conoce más la UBA!';
+                texto.textContent = 'Te invitamos a conocer más acerca de la cultura UBA.';
+            }
+        }
+
+        function finalizar() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        function intentarNuevamente() {
+            sessionStorage.removeItem('correctas');
+            sessionStorage.removeItem('incorrectas');
+            window.location.href = 'perfil.html';
+        }
+    </script>
+
+</body>
+</html>

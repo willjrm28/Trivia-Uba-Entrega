@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia UBA - Preguntas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --azul-rey: #1a237e; --azul-medio: #283593; --azul-claro: #e8eaf6; --amarillo: #fdd835; --sidebar-width: 240px; }
+        body { font-family: 'Poppins', sans-serif; background: #f5f6fa; min-height: 100vh; display: flex; }
+        .sidebar { width: var(--sidebar-width); background: var(--azul-rey); min-height: 100vh; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; }
+        .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px; }
+        .sidebar-logo img { width: 40px; height: 40px; object-fit: contain; background: white; border-radius: 50%; padding: 4px; }
+        .sidebar-logo-text h2 { color: white; font-size: 15px; font-weight: 600; }
+        .sidebar-logo-text p { color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 300; }
+        .sidebar-menu { padding: 16px 0; flex: 1; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; transition: all 0.2s ease; }
+        .menu-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .menu-item.activo { background: rgba(255,255,255,0.15); color: white; border-left: 3px solid var(--amarillo); }
+        .menu-item .icono { font-size: 18px; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .admin-info { color: rgba(255,255,255,0.7); font-size: 12px; margin-bottom: 12px; }
+        .admin-info strong { display: block; color: white; font-size: 13px; }
+        .btn-cerrar { background: rgba(255,255,255,0.1); border: none; border-radius: 8px; padding: 8px 16px; color: white; font-family: 'Poppins', sans-serif; font-size: 12px; cursor: pointer; width: 100%; transition: all 0.2s ease; }
+        .btn-cerrar:hover { background: rgba(255,255,255,0.2); }
+        .main { margin-left: var(--sidebar-width); flex: 1; padding: 32px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .page-header h1 { font-family: 'Playfair Display', serif; color: var(--azul-rey); font-size: 28px; }
+        .page-header p { color: #888; font-size: 14px; font-weight: 300; }
+        .btn-nuevo { background: var(--azul-rey); color: white; border: none; border-radius: 12px; padding: 12px 24px; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        .btn-nuevo:hover { background: var(--azul-medio); transform: translateY(-1px); }
+        .select-evento-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 16px; }
+        .select-evento-card label { color: var(--azul-rey); font-size: 14px; font-weight: 600; white-space: nowrap; }
+        .select-evento-card select { padding: 10px 16px; border: 2px solid #e8eaf6; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px; color: #333; outline: none; flex: 1; cursor: pointer; }
+        .select-evento-card select:focus { border-color: var(--azul-rey); }
+        .filtros { background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+        .filtro-select { padding: 10px 16px; border: 2px solid #e8eaf6; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px; color: #333; outline: none; cursor: pointer; transition: border-color 0.2s ease; }
+        .filtro-select:focus { border-color: var(--azul-rey); }
+        .tabla-container { background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: var(--azul-rey); color: white; }
+        th { padding: 16px 20px; text-align: left; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; }
+        td { padding: 16px 20px; font-size: 14px; color: #333; border-bottom: 1px solid #f0f0f0; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-estudiantes { background: #e3f2fd; color: #1565c0; }
+        .badge-profesores { background: #f3e5f5; color: #6a1b9a; }
+        .badge-cultura { background: #e8f5e9; color: #2e7d32; }
+        .badge-invitados { background: #fff3e0; color: #e65100; }
+        .btn-accion { border: none; border-radius: 8px; padding: 6px 14px; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; margin-right: 6px; }
+        .btn-editar { background: #e8eaf6; color: var(--azul-rey); }
+        .btn-editar:hover { background: #c5cae9; }
+        .btn-eliminar { background: #ffebee; color: #c62828; }
+        .btn-eliminar:hover { background: #ffcdd2; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.activo { display: flex; }
+        .modal { background: white; border-radius: 20px; padding: 32px; width: 90%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,0.3); }
+        .modal h2 { font-family: 'Playfair Display', serif; color: var(--azul-rey); font-size: 22px; margin-bottom: 24px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; color: var(--azul-rey); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border: 2px solid #e8eaf6; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px; color: #333; outline: none; transition: border-color 0.2s ease; }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--azul-rey); }
+        .opciones-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .opcion-input { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: 2px solid #e8eaf6; border-radius: 10px; transition: border-color 0.2s ease; }
+        .opcion-input.correcta { border-color: #4caf50; background: #f1f8e9; }
+        .opcion-input input[type="text"] { border: none; padding: 0; font-size: 13px; flex: 1; }
+        .opcion-input input[type="text"]:focus { outline: none; }
+        .opcion-input input[type="radio"] { accent-color: #4caf50; width: 16px; height: 16px; flex-shrink: 0; }
+        .modal-botones { display: flex; gap: 12px; margin-top: 24px; }
+        .btn-guardar { background: var(--azul-rey); color: white; border: none; border-radius: 10px; padding: 12px 24px; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; flex: 1; transition: all 0.2s ease; }
+        .btn-guardar:hover { background: var(--azul-medio); }
+        .btn-cancelar { background: #f5f5f5; color: #666; border: none; border-radius: 10px; padding: 12px 24px; font-family: 'Poppins', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.2s ease; }
+        .btn-cancelar:hover { background: #eee; }
+        .empty-state { text-align: center; padding: 48px; color: #aaa; }
+        .empty-state p { font-size: 15px; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <img src="../img/logo_uba.png" alt="UBA">
+            <div class="sidebar-logo-text"><h2>Trivia UBA</h2><p>Panel Admin</p></div>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item"><span class="icono">🏠</span> Dashboard</a>
+            <a href="preguntas.html" class="menu-item activo"><span class="icono">❓</span> Preguntas</a>
+            <a href="eventos.html" class="menu-item"><span class="icono">📅</span> Eventos</a>
+            <a href="reportes.html" class="menu-item"><span class="icono">📊</span> Reportes</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="admin-info">
+                <strong id="admin-nombre">Cargando...</strong>
+                Administrador
+            </div>
+            <button class="btn-cerrar" onclick="cerrarSesion()">Cerrar sesión</button>
+        </div>
+    </div>
+
+    <main class="main">
+        <div class="page-header">
+            <div>
+                <h1>Banco de Preguntas</h1>
+                <p>Gestiona todas las preguntas de la trivia</p>
+            </div>
+            <button class="btn-nuevo" onclick="abrirModalNuevo()">+ Nueva Pregunta</button>
+        </div>
+
+        <div class="select-evento-card">
+            <label>📅 Evento:</label>
+            <select id="filtro-evento" onchange="onCambioEvento()">
+                <option value="">Selecciona un evento</option>
+            </select>
+        </div>
+
+        <div class="filtros" id="seccion-filtros" style="display:none">
+            <select class="filtro-select" id="filtro-categoria" onchange="filtrarPreguntas()">
+                <option value="">Todas las categorías</option>
+                <option value="Investigacion-Estudiantes">Investigación Estudiantes</option>
+                <option value="Investigacion-Profesores">Investigación Profesores</option>
+                <option value="Cultura-UBA">Cultura UBA</option>
+                <option value="Cultura-Invitados">Cultura Invitados</option>
+            </select>
+            <select class="filtro-select" id="filtro-escuela" onchange="filtrarPreguntas()">
+                <option value="">Todas las escuelas</option>
+                <option value="Derecho">Derecho</option>
+                <option value="Ingenieria-Sistemas">Ingeniería de Sistemas</option>
+                <option value="Ingenieria-Electrica">Ingeniería Eléctrica</option>
+                <option value="Psicologia">Psicología</option>
+                <option value="Administracion-Contaduria">Administración de Empresas y Contaduría Pública</option>
+                <option value="Comunicacion-Social">Comunicación Social</option>
+            </select>
+        </div>
+
+        <div class="tabla-container" id="seccion-tabla" style="display:none">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th><th>Pregunta</th><th>Categoría</th><th>Escuela</th><th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-preguntas"></tbody>
+            </table>
+        </div>
+
+        <div id="estado-inicial" class="tabla-container">
+            <div class="empty-state"><p>📅 Selecciona un evento para ver sus preguntas</p></div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <h2 id="modal-titulo">Nueva Pregunta</h2>
+
+            <div class="form-group">
+                <label>Evento</label>
+                <select id="input-evento">
+                    <option value="">Selecciona un evento</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Texto de la pregunta</label>
+                <textarea id="input-texto" placeholder="Escribe la pregunta aquí..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Categoría</label>
+                <select id="input-categoria" onchange="mostrarEscuela()">
+                    <option value="">Selecciona una categoría</option>
+                    <option value="Investigacion-Estudiantes">Investigación Estudiantes</option>
+                    <option value="Investigacion-Profesores">Investigación Profesores</option>
+                    <option value="Cultura-UBA">Cultura UBA</option>
+                    <option value="Cultura-Invitados">Cultura Invitados</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="grupo-escuela" style="display:none">
+                <label>Escuela</label>
+                <select id="input-escuela">
+                    <option value="">Selecciona una escuela</option>
+                    <option value="Derecho">Derecho</option>
+                    <option value="Ingenieria-Sistemas">Ingeniería de Sistemas</option>
+                    <option value="Ingenieria-Electrica">Ingeniería Eléctrica</option>
+                    <option value="Psicologia">Psicología</option>
+                    <option value="Administracion-Contaduria">Administración de Empresas y Contaduría Pública</option>
+                    <option value="Comunicacion-Social">Comunicación Social</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Opciones de respuesta <small style="color:#888">(selecciona el radio de la correcta)</small></label>
+                <div class="opciones-grid">
+                    <div class="opcion-input" id="opcion-div-0">
+                        <input type="radio" name="correcta" value="0" onchange="marcarCorrecta(0)">
+                        <input type="text" id="opcion-0" placeholder="Opción A">
+                    </div>
+                    <div class="opcion-input" id="opcion-div-1">
+                        <input type="radio" name="correcta" value="1" onchange="marcarCorrecta(1)">
+                        <input type="text" id="opcion-1" placeholder="Opción B">
+                    </div>
+                    <div class="opcion-input" id="opcion-div-2">
+                        <input type="radio" name="correcta" value="2" onchange="marcarCorrecta(2)">
+                        <input type="text" id="opcion-2" placeholder="Opción C">
+                    </div>
+                    <div class="opcion-input" id="opcion-div-3">
+                        <input type="radio" name="correcta" value="3" onchange="marcarCorrecta(3)">
+                        <input type="text" id="opcion-3" placeholder="Opción D">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-botones">
+                <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-guardar" onclick="guardarPregunta()">Guardar Pregunta</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        protegerPagina();
+        const admin = obtenerAdmin();
+        if (admin) document.getElementById('admin-nombre').textContent = admin.nombre;
+
+        let preguntaEditandoId = null;
+        let eventoSeleccionado = null;
+
+        function mostrarToast(mensaje, color = '#4caf50') {
+            const toast = document.createElement('div');
+            toast.textContent = mensaje;
+            toast.style.cssText = `
+                position: fixed; bottom: 24px; right: 24px;
+                background: ${color}; color: white;
+                padding: 14px 24px; border-radius: 12px;
+                font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+                z-index: 9999; animation: fadeUp 0.3s ease;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        async function inicializar() {
+            const data = await apiEventos.obtenerTodos();
+            if (data.success) {
+                const selectFiltro = document.getElementById('filtro-evento');
+                const selectModal = document.getElementById('input-evento');
+                const emojis = { 'Activo': '🟢', 'Reprogramado': '🟠', 'Inactivo': '⚪', 'Finalizado': '🔵' };
+
+                const ordenados = [...data.data].sort((a, b) => {
+                    const orden = { 'Activo': 0, 'Reprogramado': 1, 'Inactivo': 2, 'Finalizado': 3 };
+                    return (orden[a.estado] ?? 4) - (orden[b.estado] ?? 4);
+                });
+
+                selectFiltro.innerHTML = '<option value="">Selecciona un evento</option>';
+                selectModal.innerHTML = '<option value="">Selecciona un evento</option>';
+
+                ordenados.forEach(evento => {
+                    const texto = `${emojis[evento.estado] || '⚪'} ${evento.nombre} (${evento.estado})`;
+                    selectFiltro.appendChild(new Option(texto, evento.id));
+                    selectModal.appendChild(new Option(texto, evento.id));
+                });
+
+                const activo = ordenados.find(e => e.estado === 'Activo') || ordenados[0];
+                if (activo) {
+                    selectFiltro.value = activo.id;
+                    selectModal.value = activo.id;
+                    onCambioEvento();
+                }
+            }
+        }
+
+        async function onCambioEvento() {
+            eventoSeleccionado = document.getElementById('filtro-evento').value;
+            if (eventoSeleccionado) {
+                document.getElementById('seccion-filtros').style.display = 'flex';
+                document.getElementById('seccion-tabla').style.display = 'block';
+                document.getElementById('estado-inicial').style.display = 'none';
+                document.getElementById('filtro-categoria').value = '';
+                document.getElementById('filtro-escuela').value = '';
+                await filtrarPreguntas();
+            } else {
+                document.getElementById('seccion-filtros').style.display = 'none';
+                document.getElementById('seccion-tabla').style.display = 'none';
+                document.getElementById('estado-inicial').style.display = 'block';
+            }
+        }
+
+        async function filtrarPreguntas() {
+            const evento_id = document.getElementById('filtro-evento').value;
+            const categoria = document.getElementById('filtro-categoria').value;
+            const escuela = document.getElementById('filtro-escuela').value;
+            const data = await apiPreguntas.filtrar(categoria, escuela, evento_id);
+            renderizarTabla(data.data || []);
+        }
+
+        function renderizarTabla(preguntas) {
+            const tbody = document.getElementById('tabla-preguntas');
+            if (preguntas.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><p>📭 No hay preguntas para este evento</p></div></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = preguntas.map(p => `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>${p.texto.substring(0, 60)}${p.texto.length > 60 ? '...' : ''}</td>
+                    <td><span class="badge ${getBadgeClass(p.categoria)}">${p.categoria}</span></td>
+                    <td>${p.escuela || '-'}</td>
+                    <td>
+                        <button class="btn-accion btn-editar" onclick="abrirModalEditar(${p.id})">Editar</button>
+                        <button class="btn-accion btn-eliminar" onclick="eliminarPregunta(${p.id})">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getBadgeClass(categoria) {
+            if (categoria === 'Investigacion-Estudiantes') return 'badge-estudiantes';
+            if (categoria === 'Investigacion-Profesores') return 'badge-profesores';
+            if (categoria === 'Cultura-Invitados') return 'badge-invitados';
+            return 'badge-cultura';
+        }
+
+        function mostrarEscuela() {
+            const categoria = document.getElementById('input-categoria').value;
+            document.getElementById('grupo-escuela').style.display =
+                (categoria === 'Investigacion-Estudiantes' || categoria === 'Investigacion-Profesores') ? 'block' : 'none';
+        }
+
+        function marcarCorrecta(index) {
+            for (let i = 0; i < 4; i++) document.getElementById(`opcion-div-${i}`).classList.remove('correcta');
+            document.getElementById(`opcion-div-${index}`).classList.add('correcta');
+        }
+
+        function abrirModalNuevo() {
+            preguntaEditandoId = null;
+            document.getElementById('modal-titulo').textContent = 'Nueva Pregunta';
+            document.getElementById('input-evento').value = eventoSeleccionado || '';
+            document.getElementById('input-texto').value = '';
+            document.getElementById('input-categoria').value = '';
+            document.getElementById('input-escuela').value = '';
+            document.getElementById('grupo-escuela').style.display = 'none';
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`opcion-${i}`).value = '';
+                document.getElementById(`opcion-div-${i}`).classList.remove('correcta');
+            }
+            document.querySelectorAll('input[name="correcta"]').forEach(r => r.checked = false);
+            document.getElementById('modal-overlay').classList.add('activo');
+        }
+
+        async function abrirModalEditar(id) {
+            preguntaEditandoId = id;
+            document.getElementById('modal-titulo').textContent = 'Editar Pregunta';
+            const data = await apiPreguntas.filtrar('', '', eventoSeleccionado);
+            const pregunta = data.data.find(p => p.id === id);
+            if (!pregunta) return;
+            document.getElementById('input-evento').value = pregunta.evento_id || '';
+            document.getElementById('input-texto').value = pregunta.texto;
+            document.getElementById('input-categoria').value = pregunta.categoria;
+            document.getElementById('input-escuela').value = pregunta.escuela || '';
+            mostrarEscuela();
+            const resOpciones = await apiCall(`/preguntas/${id}/opciones`);
+            if (resOpciones.success) {
+                resOpciones.data.forEach((opcion, index) => {
+                    document.getElementById(`opcion-${index}`).value = opcion.texto;
+                    document.getElementById(`opcion-${index}`).dataset.opcionId = opcion.id;
+                    if (opcion.es_correcta) {
+                        document.querySelector(`input[name="correcta"][value="${index}"]`).checked = true;
+                        marcarCorrecta(index);
+                    }
+                });
+            }
+            document.getElementById('modal-overlay').classList.add('activo');
+        }
+
+        function cerrarModal() { document.getElementById('modal-overlay').classList.remove('activo'); }
+
+        async function guardarPregunta() {
+            const evento_id = document.getElementById('input-evento').value;
+            const texto = document.getElementById('input-texto').value.trim();
+            const categoria = document.getElementById('input-categoria').value;
+            const escuela = document.getElementById('input-escuela').value;
+            const correctaSeleccionada = document.querySelector('input[name="correcta"]:checked');
+
+            if (!evento_id) { alert('Por favor selecciona un evento'); return; }
+            if (!texto) { alert('Por favor escribe el texto de la pregunta'); return; }
+            if (!categoria) { alert('Por favor selecciona una categoría'); return; }
+            if (!correctaSeleccionada) { alert('Por favor selecciona la respuesta correcta'); return; }
+
+            const opciones = [];
+            for (let i = 0; i < 4; i++) {
+                const inputOpcion = document.getElementById(`opcion-${i}`);
+                if (!inputOpcion.value.trim()) { alert(`Por favor completa la opción ${String.fromCharCode(65+i)}`); return; }
+                opciones.push({
+                    id: inputOpcion.dataset.opcionId,
+                    texto: inputOpcion.value.trim(),
+                    es_correcta: parseInt(correctaSeleccionada.value) === i ? 1 : 0
+                });
+            }
+
+            let data;
+            if (preguntaEditandoId) {
+                data = await apiPreguntas.editar(preguntaEditandoId, { evento_id, texto, categoria, escuela, opciones });
+            } else {
+                data = await apiPreguntas.crear({ evento_id, texto, categoria, escuela, opciones });
+            }
+
+            if (data.success) {
+                cerrarModal();
+                filtrarPreguntas();
+                mostrarToast('✅ Pregunta guardada exitosamente');
+            } else {
+                mostrarToast('❌ Error: ' + (data.mensaje || 'Error desconocido'), '#c62828');
+            }
+        }
+
+        async function eliminarPregunta(id) {
+            if (!confirm('¿Estás seguro de eliminar esta pregunta?')) return;
+            const data = await apiPreguntas.eliminar(id);
+            if (data.success) {
+                filtrarPreguntas();
+                mostrarToast('🗑️ Pregunta eliminada');
+            } else {
+                mostrarToast('❌ Error al eliminar', '#c62828');
+            }
+        }
+
+        inicializar();
+    </script>
+
+</body>
+</html>
