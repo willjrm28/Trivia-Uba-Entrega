@@ -18,13 +18,18 @@ app.use(cors());
 app.use(express.json());
 
 // Servir el frontend como archivos estáticos
-app.use(express.static(path.join(__dirname, 'frontend')));
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Rutas
 app.use('/api/preguntas', preguntasRoutes);
 app.use('/api/eventos', eventosRoutes);
 app.use('/api/participaciones', participacionesRoutes);
 app.use('/api/admin', adminRoutes);
+
+// Ruta raíz: servir index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
 
 // ─────────────────────────────────────────
 // CRON JOB: Revisión automática de eventos
@@ -87,13 +92,7 @@ revisarEventos();
 setInterval(revisarEventos, 5 * 60 * 1000);
 
 // Iniciar servidor
-app.listen(PORT, '0.0.0.0', async () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
     console.log(`🕐 Revisión automática de eventos activa (cada 5 min)`);
-    try {
-        const bcrypt = require('bcryptjs');
-        const hash = await bcrypt.hash('Admin2026*', 10);
-        await db.query('UPDATE administradores SET password = ? WHERE email = ?', [hash, 'admin@uba.edu.ve']);
-        console.log('Password actualizado');
-    } catch(e) {}
 });
