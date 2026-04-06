@@ -18,7 +18,7 @@ app.use(cors());
 app.use(express.json());
 
 // Servir el frontend como archivos estáticos
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, 'frontend')));
 
 // Rutas
 app.use('/api/preguntas', preguntasRoutes);
@@ -28,7 +28,7 @@ app.use('/api/admin', adminRoutes);
 
 // Ruta raíz: servir index.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    res.sendFile(path.join(__dirname, 'frontend/index.html'));
 });
 
 // ─────────────────────────────────────────
