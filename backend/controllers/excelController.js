@@ -5,7 +5,7 @@ const path = require('path');
 
 const AZUL_REY = '1a237e';
 
-const LOGO_PATH = path.join(__dirname, '../../frontend/img/logo_uba.png');
+const LOGO_PATH = path.join(__dirname, '../frontend/img/logo_uba.png');
 
 async function obtenerDatosParaHoja(evento_id, fecha) {
     let filtros = [];
