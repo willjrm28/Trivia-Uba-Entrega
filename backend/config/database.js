@@ -2,14 +2,14 @@ const mysql2 = require('mysql2');
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 
 const pool = mysql2.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'trivia_uba',
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
 });
 
 const promisePool = pool.promise();
-
 module.exports = promisePool;
