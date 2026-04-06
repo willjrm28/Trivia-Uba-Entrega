@@ -278,7 +278,7 @@
         const admin = obtenerAdmin();
         if (admin) document.getElementById('admin-nombre').textContent = admin.nombre;
 
-        const URL_APP = CONFIG.BASE_URL.replace(':3000/api', ':5500/frontend/index.html');
+        const URL_APP = window.location.origin + '/index.html';
 
         let eventoEditandoId = null;
         let eventoReprogramandoId = null;
