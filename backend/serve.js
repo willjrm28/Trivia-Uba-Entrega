@@ -87,7 +87,13 @@ revisarEventos();
 setInterval(revisarEventos, 5 * 60 * 1000);
 
 // Iniciar servidor
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', async () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
     console.log(`🕐 Revisión automática de eventos activa (cada 5 min)`);
+    try {
+        const bcrypt = require('bcryptjs');
+        const hash = await bcrypt.hash('Admin2026*', 10);
+        await db.query('UPDATE administradores SET password = ? WHERE email = ?', [hash, 'admin@uba.edu.ve']);
+        console.log('Password actualizado');
+    } catch(e) {}
 });
