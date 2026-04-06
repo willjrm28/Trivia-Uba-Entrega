@@ -18,21 +18,13 @@ app.use(cors());
 app.use(express.json());
 
 // Servir el frontend como archivos estáticos
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, 'frontend')));
 
 // Rutas
 app.use('/api/preguntas', preguntasRoutes);
 app.use('/api/eventos', eventosRoutes);
 app.use('/api/participaciones', participacionesRoutes);
 app.use('/api/admin', adminRoutes);
-
-// Ruta de prueba
-app.get('/', (req, res) => {
-    res.json({ 
-        mensaje: '¡Servidor de Trivia UBA funcionando!',
-        version: '1.0.0'
-    });
-});
 
 // ─────────────────────────────────────────
 // CRON JOB: Revisión automática de eventos
