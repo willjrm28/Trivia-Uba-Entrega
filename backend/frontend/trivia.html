@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Trivia UBA - Preguntas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --azul-rey: #1a237e; --amarillo: #fdd835; }
+        html, body { height: 100%; font-family: 'Poppins', sans-serif; }
+        body { min-height: 100vh; min-height: 100dvh; position: relative; overflow-x: hidden; }
+        .collage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); z-index: 1; }
+        .collage-foto { background-size: cover; background-position: center; }
+        .collage-foto:nth-child(1) { background-image: url('img/foto6.jpg'); }
+        .collage-foto:nth-child(2) { background-image: url('img/foto2.jpg'); }
+        .collage-foto:nth-child(3) { background-image: url('img/foto7.jpg'); }
+        .collage-foto:nth-child(4) { background-image: url('img/foto1.jpg'); }
+        .collage-foto:nth-child(5) { background-image: url('img/foto4.jpg'); }
+        .collage-foto:nth-child(6) { background-image: url('img/foto3.jpg'); }
+        .collage-foto:nth-child(7) { background-image: url('img/foto5.jpg'); }
+        .collage-foto:nth-child(8) { background-image: url('img/foto7.jpg'); }
+        .collage-foto:nth-child(9) { background-image: url('img/campus.jpg'); }
+        .filtro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(160deg, rgba(26, 35, 126, 0.88) 0%, rgba(40, 53, 147, 0.78) 50%, rgba(26, 35, 126, 0.92) 100%); z-index: 2; }
+        .contenido { position: relative; z-index: 3; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding: 28px 20px 32px; max-width: 430px; margin: 0 auto; gap: 16px; }
+        .header { display: flex; flex-direction: column; align-items: center; animation: fadeDown 0.6s ease forwards; width: 100%; }
+        .logo-pequeno { background: white; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; padding: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); margin-bottom: 10px; }
+        .logo-pequeno img { width: 100%; height: 100%; object-fit: contain; }
+        .titulo { font-family: 'Playfair Display', serif; color: white; font-size: 24px; text-shadow: 0 2px 8px rgba(0,0,0,0.3); margin-bottom: 4px; }
+        .subtitulo { color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 300; }
+        .loading { color: white; text-align: center; font-size: 15px; font-weight: 300; padding: 40px 0; }
+        .preguntas-container { display: flex; flex-direction: column; gap: 16px; width: 100%; animation: fadeUp 0.6s ease 0.2s both; }
+        .pregunta-card { background: rgba(255,255,255,0.97); border-radius: 20px; padding: 18px 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        .pregunta-numero { background: var(--azul-rey); color: white; font-size: 10px; font-weight: 600; padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 10px; letter-spacing: 1px; text-transform: uppercase; }
+        .pregunta-texto { color: var(--azul-rey); font-size: 14px; font-weight: 600; line-height: 1.5; margin-bottom: 14px; }
+        .opciones { display: flex; flex-direction: column; gap: 8px; }
+        .opcion { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 2px solid #e8eaf6; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; background: white; }
+        .opcion:hover { border-color: var(--azul-rey); background: #f3f4ff; }
+        .opcion.seleccionada { border-color: var(--azul-rey); background: #e8eaf6; }
+        .opcion input[type="radio"] { accent-color: var(--azul-rey); width: 17px; height: 17px; flex-shrink: 0; }
+        .opcion label { color: #333; font-size: 13px; font-weight: 300; cursor: pointer; line-height: 1.4; }
+        .btn-enviar { background: var(--amarillo); color: var(--azul-rey); border: none; border-radius: 50px; padding: 15px 0; width: 100%; font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 8px 24px rgba(253,216,53,0.4); transition: all 0.2s ease; animation: fadeUp 0.6s ease 0.3s both; }
+        .btn-enviar:disabled { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.4); box-shadow: none; cursor: not-allowed; }
+        .btn-enviar:not(:disabled):hover { transform: translateY(-2px); }
+        .btn-enviar:not(:disabled):active { transform: scale(0.97); }
+        .footer { color: rgba(255,255,255,0.4); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+        @media (max-height: 700px) { .contenido { padding: 20px 18px 24px; gap: 12px; } .logo-pequeno { width: 46px; height: 46px; margin-bottom: 6px; } .titulo { font-size: 20px; } .pregunta-card { padding: 14px 14px; } .pregunta-texto { font-size: 13px; } .opcion { padding: 9px 12px; } .opcion label { font-size: 12px; } }
+        @media (max-height: 580px) { .logo-pequeno { display: none; } .contenido { gap: 10px; padding: 16px 16px 20px; } }
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="collage">
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+    </div>
+    <div class="filtro"></div>
+    <div class="contenido">
+        <div class="header">
+            <div class="logo-pequeno">
+                <img src="img/logo_uba.png" alt="Logo UBA">
+            </div>
+            <h1 class="titulo">¡Hora de la Trivia!</h1>
+            <p class="subtitulo">Responde ambas preguntas para continuar</p>
+        </div>
+        <div id="preguntas-container" class="preguntas-container">
+            <div class="loading">⏳ Cargando preguntas...</div>
+        </div>
+        <button id="btn-enviar" class="btn-enviar" disabled onclick="enviarRespuestas()">
+            Enviar respuestas
+        </button>
+        <p class="footer">Dirección de Postgrado UBA</p>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        const perfil = sessionStorage.getItem('perfil');
+        const urlParams = new URLSearchParams(window.location.search);
+        const escuela = urlParams.get('escuela') || sessionStorage.getItem('escuela');
+        let preguntas = [];
+        let respuestas = {};
+
+        if (!perfil) window.location.href = 'index.html';
+
+        async function cargarPreguntas() {
+            try {
+                let url = `${API_URL}/participaciones/preguntas?perfil=${perfil}`;
+                if (escuela) url += `&escuela=${escuela}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (!data.success) {
+                    document.getElementById('preguntas-container').innerHTML =
+                        `<div class="loading">⚠️ ${data.mensaje}</div>`;
+                    return;
+                }
+                preguntas = data.data;
+                mostrarPreguntas();
+            } catch (error) {
+                document.getElementById('preguntas-container').innerHTML =
+                    `<div class="loading">❌ Error al cargar preguntas. Verifica tu conexión.</div>`;
+            }
+        }
+
+        function mostrarPreguntas() {
+            const container = document.getElementById('preguntas-container');
+            container.innerHTML = '';
+            preguntas.forEach((pregunta, index) => {
+                const card = document.createElement('div');
+                card.className = 'pregunta-card';
+                card.innerHTML = `
+                    <span class="pregunta-numero">Pregunta ${index + 1} de 2</span>
+                    <p class="pregunta-texto">${pregunta.texto}</p>
+                    <div class="opciones" id="opciones-${index}">
+                        ${pregunta.opciones.map((opcion, i) => `
+                            <div class="opcion" id="opcion-${index}-${i}" onclick="seleccionarOpcion(${index}, ${opcion.id}, ${opcion.es_correcta}, ${i})">
+                                <input type="radio" name="pregunta-${index}" id="radio-${index}-${i}">
+                                <label for="radio-${index}-${i}">${opcion.texto}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function seleccionarOpcion(preguntaIndex, opcionId, esCorrecta, opcionIndex) {
+            const opciones = document.querySelectorAll(`#opciones-${preguntaIndex} .opcion`);
+            opciones.forEach(op => op.classList.remove('seleccionada'));
+            document.getElementById(`opcion-${preguntaIndex}-${opcionIndex}`).classList.add('seleccionada');
+            document.getElementById(`radio-${preguntaIndex}-${opcionIndex}`).checked = true;
+            respuestas[preguntaIndex] = { opcionId, esCorrecta };
+            verificarCompleto();
+        }
+
+        function verificarCompleto() {
+            const btnEnviar = document.getElementById('btn-enviar');
+            if (Object.keys(respuestas).length === 2) btnEnviar.disabled = false;
+        }
+
+        async function enviarRespuestas() {
+            const correctas = Object.values(respuestas).filter(r => r.esCorrecta === 1).length;
+            const incorrectas = 2 - correctas;
+            try {
+                await fetch(`${API_URL}/participaciones`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        perfil,
+                        escuela: escuela || null,
+                        respuestas_correctas: correctas,
+                        respuestas_incorrectas: incorrectas
+                    })
+                });
+            } catch (error) {
+                console.log('Error al registrar participación');
+            }
+            sessionStorage.setItem('correctas', correctas);
+            sessionStorage.setItem('incorrectas', incorrectas);
+            window.location.href = 'resultado.html';
+        }
+
+        cargarPreguntas();
+    </script>
+</body>
+</html>

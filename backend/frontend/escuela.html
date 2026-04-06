@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Trivia UBA - Escuela</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --azul-rey: #1a237e;
+            --amarillo: #fdd835;
+        }
+
+        html, body { height: 100%; font-family: 'Poppins', sans-serif; }
+
+        body { min-height: 100vh; min-height: 100dvh; position: relative; overflow-x: hidden; }
+
+        .collage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); z-index: 1; }
+
+        .collage-foto { background-size: cover; background-position: center; }
+        .collage-foto:nth-child(1) { background-image: url('img/foto3.jpg'); }
+        .collage-foto:nth-child(2) { background-image: url('img/foto7.jpg'); }
+        .collage-foto:nth-child(3) { background-image: url('img/foto1.jpg'); }
+        .collage-foto:nth-child(4) { background-image: url('img/foto5.jpg'); }
+        .collage-foto:nth-child(5) { background-image: url('img/foto2.jpg'); }
+        .collage-foto:nth-child(6) { background-image: url('img/foto6.jpg'); }
+        .collage-foto:nth-child(7) { background-image: url('img/foto4.jpg'); }
+        .collage-foto:nth-child(8) { background-image: url('img/foto3.jpg'); }
+        .collage-foto:nth-child(9) { background-image: url('img/campus.jpg'); }
+
+        .filtro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(160deg, rgba(26, 35, 126, 0.88) 0%, rgba(40, 53, 147, 0.78) 50%, rgba(26, 35, 126, 0.92) 100%); z-index: 2; }
+
+        .contenido { position: relative; z-index: 3; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 24px; max-width: 430px; margin: 0 auto; gap: 16px; }
+
+        .header { display: flex; flex-direction: column; align-items: center; animation: fadeDown 0.6s ease forwards; }
+
+        .logo-pequeno { background: white; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; padding: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); margin-bottom: 10px; }
+        .logo-pequeno img { width: 100%; height: 100%; object-fit: contain; }
+
+        .titulo { font-family: 'Playfair Display', serif; color: white; font-size: 24px; text-shadow: 0 2px 8px rgba(0,0,0,0.3); margin-bottom: 4px; text-align: center; }
+        .subtitulo { color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 300; text-align: center; }
+
+        .escuelas { display: flex; flex-direction: column; gap: 10px; width: 100%; animation: fadeUp 0.6s ease 0.2s both; }
+
+        .btn-escuela { background: rgba(255,255,255,0.95); border: none; border-radius: 16px; padding: 13px 18px; width: 100%; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 16px rgba(0,0,0,0.15); text-align: left; }
+        .btn-escuela:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); background: white; }
+        .btn-escuela:active { transform: scale(0.97); }
+
+        .icono-escuela { background: var(--azul-rey); color: white; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+
+        .nombre-escuela { color: var(--azul-rey); font-size: 13px; font-weight: 600; line-height: 1.3; }
+
+        .btn-volver { background: transparent; border: 1px solid rgba(255,255,255,0.4); border-radius: 50px; padding: 10px 32px; color: white; font-family: 'Poppins', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s ease; animation: fadeUp 0.6s ease 0.3s both; }
+        .btn-volver:hover { background: rgba(255,255,255,0.1); border-color: white; }
+
+        @media (max-height: 700px) {
+            .contenido { gap: 12px; padding: 20px 20px; }
+            .logo-pequeno { width: 48px; height: 48px; margin-bottom: 6px; }
+            .titulo { font-size: 20px; }
+            .btn-escuela { padding: 10px 16px; }
+            .icono-escuela { width: 32px; height: 32px; font-size: 14px; }
+            .nombre-escuela { font-size: 12px; }
+        }
+
+        @media (max-height: 580px) {
+            .logo-pequeno { display: none; }
+            .contenido { gap: 8px; }
+            .btn-escuela { padding: 9px 14px; }
+        }
+
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="collage">
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+        <div class="collage-foto"></div>
+    </div>
+
+    <div class="filtro"></div>
+
+    <div class="contenido">
+        <div class="header">
+            <div class="logo-pequeno">
+                <img src="img/logo_uba.png" alt="Logo UBA">
+            </div>
+            <h1 class="titulo">¿De qué escuela eres?</h1>
+            <p class="subtitulo">Recibirás preguntas específicas de tu área</p>
+        </div>
+
+        <div class="escuelas">
+            <button class="btn-escuela" onclick="seleccionarEscuela('Derecho')">
+                <div class="icono-escuela">⚖️</div>
+                <span class="nombre-escuela">Derecho</span>
+            </button>
+            <button class="btn-escuela" onclick="seleccionarEscuela('Ingenieria-Sistemas')">
+                <div class="icono-escuela">💻</div>
+                <span class="nombre-escuela">Ingeniería de Sistemas</span>
+            </button>
+            <button class="btn-escuela" onclick="seleccionarEscuela('Ingenieria-Electrica')">
+                <div class="icono-escuela">⚡</div>
+                <span class="nombre-escuela">Ingeniería Eléctrica</span>
+            </button>
+            <button class="btn-escuela" onclick="seleccionarEscuela('Psicologia')">
+                <div class="icono-escuela">🧠</div>
+                <span class="nombre-escuela">Psicología</span>
+            </button>
+            <button class="btn-escuela" onclick="seleccionarEscuela('Administracion-Contaduria')">
+                <div class="icono-escuela">📊</div>
+                <span class="nombre-escuela">Administración de Empresas y Contaduría Pública</span>
+            </button>
+            <button class="btn-escuela" onclick="seleccionarEscuela('Comunicacion-Social')">
+                <div class="icono-escuela">📡</div>
+                <span class="nombre-escuela">Comunicación Social</span>
+            </button>
+        </div>
+
+        <button class="btn-volver" onclick="window.location.href='perfil.html'">
+            ← Volver
+        </button>
+    </div>
+
+    <script>
+        function seleccionarEscuela(escuela) {
+            sessionStorage.setItem('escuela', escuela);
+            window.location.href = 'trivia.html?escuela=' + escuela;
+        }
+    </script>
+
+</body>
+</html>
