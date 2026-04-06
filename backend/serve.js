@@ -92,7 +92,16 @@ revisarEventos();
 setInterval(revisarEventos, 5 * 60 * 1000);
 
 // Iniciar servidor
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', async () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
     console.log(`🕐 Revisión automática de eventos activa (cada 5 min)`);
+    try {
+        const bcrypt = require('bcryptjs');
+        const hash = await bcrypt.hash('Admin2026*', 10);
+        const [existe] = await db.query('SELECT id FROM administradores WHERE email = ?', ['admin@uba.edu.ve']);
+        if (existe.length === 0) {
+            await db.query('INSERT INTO administradores (nombre, email, password) VALUES (?, ?, ?)', ['Administrador', 'admin@uba.edu.ve', hash]);
+            console.log('Admin creado');
+        }
+    } catch(e) { console.error(e); }
 });
