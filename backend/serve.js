@@ -98,10 +98,7 @@ app.listen(PORT, '0.0.0.0', async () => {
     try {
         const bcrypt = require('bcryptjs');
         const hash = await bcrypt.hash('Admin2026*', 10);
-        const [existe] = await db.query('SELECT id FROM administradores WHERE email = ?', ['admin@uba.edu.ve']);
-        if (existe.length === 0) {
-            await db.query('INSERT INTO administradores (nombre, email, password) VALUES (?, ?, ?)', ['Administrador', 'admin@uba.edu.ve', hash]);
-            console.log('Admin creado');
-        }
+        await db.query('UPDATE administradores SET password = ? WHERE email = ?', [hash, 'admin@uba.edu.ve']);
+console.log('Password actualizado');
     } catch(e) { console.error(e); }
 });
