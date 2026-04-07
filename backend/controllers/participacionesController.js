@@ -133,7 +133,7 @@ const obtenerEstadisticas = async (req, res) => {
 // Obtener preguntas aleatorias según perfil
 const obtenerPreguntasAleatorias = async (req, res) => {
     try {
-        const { perfil, escuela, evento } = req.query;
+        const { perfil, escuela } = req.query;
 
         let categoria;
         if (perfil === 'Estudiante') {
@@ -146,19 +146,14 @@ const obtenerPreguntasAleatorias = async (req, res) => {
             categoria = 'Cultura-UBA';
         }
 
-        let query = `SELECT p.* FROM preguntas p INNER JOIN eventos e ON p.evento_id = e.id WHERE p.categoria = ? AND p.activa = 1 AND e.estado = 'Activo'`;
+        let query = `SELECT * FROM preguntas WHERE categoria = ? AND activa = 1`;
         let params = [categoria];
 
-        if (evento) {
-            query += ' AND e.nombre = ?';
-            params.push(evento);
-        }
-
         if ((perfil === 'Estudiante' || perfil === 'Profesor') && escuela) {
-            query += ' AND (p.escuela = ? OR p.escuela IS NULL)';
+            query += ' AND (escuela = ? OR escuela IS NULL)';
             params.push(escuela);
         }
-
+        
         query += ' ORDER BY RAND() LIMIT 2';
 
         const [preguntas] = await db.query(query, params);
