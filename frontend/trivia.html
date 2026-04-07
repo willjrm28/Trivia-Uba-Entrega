@@ -85,6 +85,7 @@
         const perfil = sessionStorage.getItem('perfil');
         const urlParams = new URLSearchParams(window.location.search);
         const escuela = urlParams.get('escuela') || sessionStorage.getItem('escuela');
+        const evento = sessionStorage.getItem('evento');
         let preguntas = [];
         let respuestas = {};
 
@@ -94,6 +95,7 @@
             try {
                 let url = `${API_URL}/participaciones/preguntas?perfil=${perfil}`;
                 if (escuela) url += `&escuela=${escuela}`;
+                if (evento) url += `&evento=${encodeURIComponent(evento)}`;
                 const response = await fetch(url);
                 const data = await response.json();
                 if (!data.success) {
