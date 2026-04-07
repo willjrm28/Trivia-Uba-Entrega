@@ -7,41 +7,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
             --azul-rey: #1a237e;
             --azul-medio: #283593;
             --amarillo: #fdd835;
         }
-
-        html, body {
-            height: 100%;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            min-height: 100dvh;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* CAPA 1: Collage de fotos */
-        .collage {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            z-index: 1;
-        }
-
-        .collage-foto {
-            background-size: cover;
-            background-position: center;
-        }
-
+        html, body { height: 100%; font-family: 'Poppins', sans-serif; }
+        body { min-height: 100vh; min-height: 100dvh; position: relative; overflow-x: hidden; }
+        .collage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); z-index: 1; }
+        .collage-foto { background-size: cover; background-position: center; }
         .collage-foto:nth-child(1) { background-image: url('img/foto1.jpg'); }
         .collage-foto:nth-child(2) { background-image: url('img/foto2.jpg'); }
         .collage-foto:nth-child(3) { background-image: url('img/foto3.jpg'); }
@@ -51,173 +25,27 @@
         .collage-foto:nth-child(7) { background-image: url('img/foto7.jpg'); }
         .collage-foto:nth-child(8) { background-image: url('img/campus.jpg'); }
         .collage-foto:nth-child(9) { background-image: url('img/foto1.jpg'); background-position: right center; }
-
-        /* CAPA 2: Filtro azul */
-        .filtro {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(
-                160deg,
-                rgba(26, 35, 126, 0.85) 0%,
-                rgba(40, 53, 147, 0.75) 40%,
-                rgba(26, 35, 126, 0.90) 100%
-            );
-            z-index: 2;
-        }
-
-        /* CAPA 3: Contenido */
-        .contenido {
-            position: relative;
-            z-index: 3;
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 32px 24px;
-            max-width: 430px;
-            margin: 0 auto;
-            gap: 24px;
-        }
-
-        /* Logo */
-        .logo-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            animation: fadeDown 0.8s ease forwards;
-        }
-
-        .logo-circulo {
-            background: white;
-            border-radius: 50%;
-            width: 100px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 14px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            margin-bottom: 16px;
-        }
-
-        .logo-circulo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .titulo {
-            font-family: 'Playfair Display', serif;
-            color: white;
-            font-size: 44px;
-            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            line-height: 1;
-            margin-bottom: 6px;
-        }
-
-        .subtitulo {
-            color: rgba(255,255,255,0.75);
-            font-size: 14px;
-            font-weight: 300;
-            font-style: italic;
-            letter-spacing: 1px;
-        }
-
-        /* Recuadro bienvenida */
-        .recuadro {
-            background: rgba(255, 255, 255, 0.97);
-            border-radius: 24px;
-            padding: 24px 20px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.25);
-            animation: fadeUp 0.8s ease 0.2s both;
-        }
-
-        .recuadro h2 {
-            color: var(--azul-rey);
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            line-height: 1.4;
-        }
-
-        .recuadro p {
-            color: #555;
-            font-size: 13px;
-            font-weight: 300;
-            line-height: 1.6;
-        }
-
-        /* Botón */
-        .btn-comenzar {
-            background: var(--amarillo);
-            color: var(--azul-rey);
-            border: none;
-            border-radius: 50px;
-            padding: 16px 0;
-            width: 100%;
-            font-family: 'Poppins', sans-serif;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(253, 216, 53, 0.4);
-            transition: all 0.2s ease;
-            animation: fadeUp 0.8s ease 0.4s both;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-comenzar:hover {
-            background: #ffee58;
-            transform: translateY(-2px);
-        }
-
+        .filtro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(160deg, rgba(26, 35, 126, 0.85) 0%, rgba(40, 53, 147, 0.75) 40%, rgba(26, 35, 126, 0.90) 100%); z-index: 2; }
+        .contenido { position: relative; z-index: 3; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; max-width: 430px; margin: 0 auto; gap: 24px; }
+        .logo-container { display: flex; flex-direction: column; align-items: center; animation: fadeDown 0.8s ease forwards; }
+        .logo-circulo { background: white; border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; padding: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); margin-bottom: 16px; }
+        .logo-circulo img { width: 100%; height: 100%; object-fit: contain; }
+        .titulo { font-family: 'Playfair Display', serif; color: white; font-size: 44px; text-shadow: 0 4px 12px rgba(0,0,0,0.3); line-height: 1; margin-bottom: 6px; }
+        .subtitulo { color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 300; font-style: italic; letter-spacing: 1px; }
+        .recuadro { background: rgba(255, 255, 255, 0.97); border-radius: 24px; padding: 24px 20px; width: 100%; text-align: center; box-shadow: 0 16px 48px rgba(0,0,0,0.25); animation: fadeUp 0.8s ease 0.2s both; }
+        .recuadro h2 { color: var(--azul-rey); font-size: 16px; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+        .recuadro p { color: #555; font-size: 13px; font-weight: 300; line-height: 1.6; }
+        .btn-comenzar { background: var(--amarillo); color: var(--azul-rey); border: none; border-radius: 50px; padding: 16px 0; width: 100%; font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; cursor: pointer; box-shadow: 0 8px 24px rgba(253, 216, 53, 0.4); transition: all 0.2s ease; animation: fadeUp 0.8s ease 0.4s both; letter-spacing: 0.5px; }
+        .btn-comenzar:hover { background: #ffee58; transform: translateY(-2px); }
         .btn-comenzar:active { transform: scale(0.97); }
-
-        .footer {
-            color: rgba(255,255,255,0.5);
-            font-size: 11px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            animation: fadeUp 0.8s ease 0.5s both;
-        }
-
-        /* Pantallas pequeñas */
-        @media (max-height: 700px) {
-            .logo-circulo {
-                width: 80px;
-                height: 80px;
-                margin-bottom: 10px;
-            }
-            .titulo { font-size: 36px; }
-            .contenido { gap: 16px; padding: 24px 20px; }
-            .recuadro { padding: 18px 16px; }
-            .recuadro h2 { font-size: 14px; }
-        }
-
-        @media (max-height: 580px) {
-            .logo-circulo { width: 64px; height: 64px; }
-            .titulo { font-size: 28px; }
-            .subtitulo { font-size: 12px; }
-            .contenido { gap: 12px; }
-        }
-
-        @keyframes fadeDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .footer { color: rgba(255,255,255,0.5); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; animation: fadeUp 0.8s ease 0.5s both; }
+        @media (max-height: 700px) { .logo-circulo { width: 80px; height: 80px; margin-bottom: 10px; } .titulo { font-size: 36px; } .contenido { gap: 16px; padding: 24px 20px; } .recuadro { padding: 18px 16px; } .recuadro h2 { font-size: 14px; } }
+        @media (max-height: 580px) { .logo-circulo { width: 64px; height: 64px; } .titulo { font-size: 28px; } .subtitulo { font-size: 12px; } .contenido { gap: 12px; } }
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-
     <div class="collage">
         <div class="collage-foto"></div>
         <div class="collage-foto"></div>
@@ -229,9 +57,7 @@
         <div class="collage-foto"></div>
         <div class="collage-foto"></div>
     </div>
-
     <div class="filtro"></div>
-
     <div class="contenido">
         <div class="logo-container">
             <div class="logo-circulo">
@@ -240,19 +66,26 @@
             <h1 class="titulo">Trivia</h1>
             <p class="subtitulo">Investigación y Cultura</p>
         </div>
-
         <div class="recuadro">
             <h2>¡Bienvenido a la Trivia de Investigación y Cultura UBA!</h2>
             <p>Responde 2 preguntas y gana un premio en el Stand de Postgrado</p>
         </div>
-
         <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:16px;">
-            <button class="btn-comenzar" onclick="window.location.href='perfil.html'">
+            <button class="btn-comenzar" onclick="comenzar()">
                 ¡Comenzar!
             </button>
             <p class="footer">Dirección de Postgrado UBA</p>
         </div>
     </div>
 
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const evento = urlParams.get('evento');
+        if (evento) sessionStorage.setItem('evento', evento);
+
+        function comenzar() {
+            window.location.href = 'perfil.html';
+        }
+    </script>
 </body>
 </html>
