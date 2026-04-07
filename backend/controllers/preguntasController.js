@@ -32,11 +32,40 @@ const obtenerPreguntas = async (req, res) => {
 const obtenerPreguntasPorCategoria = async (req, res) => {
     try {
         const { categoria, escuela } = req.query;
-        let query = 'SELECT * FROM preguntas WHERE activa = 1';
-        let params = [];
-        if (categoria) { query += ' AND categoria = ?'; params.push(categoria); }
-        if (escuela) { query += ' AND escuela = ?'; params.push(escuela); }
+
+        // 1. Buscamos automáticamente el ID del evento que tiene el estado 'Activo'
+        const [eventosActivos] = await db.query("SELECT id FROM eventos WHERE estado = 'Activo' LIMIT 1");
+
+        // Si no hay ningún evento activo configurado en la base de datos, detenemos la búsqueda
+        if (eventosActivos.length === 0) {
+            return res.json({ 
+                success: true, 
+                total: 0, 
+                data: [], 
+                mensaje: 'No hay eventos activos en este momento.' 
+            });
+        }
+
+        // Guardamos el ID de ese evento (en el caso de tu captura, guardaría el ID 3)
+        const idEventoActivo = eventosActivos[0].id;
+
+        // 2. Buscamos las preguntas, exigiendo que coincidan con el idEventoActivo
+        let query = 'SELECT * FROM preguntas WHERE activa = 1 AND evento_id = ?';
+        let params = [idEventoActivo];
+
+        // Añadimos los filtros extra si vienen en la petición (como la escuela)
+        if (categoria) { 
+            query += ' AND categoria = ?'; 
+            params.push(categoria); 
+        }
+        if (escuela) { 
+            query += ' AND escuela = ?'; 
+            params.push(escuela); 
+        }
+
+        // Ejecutamos la consulta final
         const [preguntas] = await db.query(query, params);
+        
         res.json({ success: true, total: preguntas.length, data: preguntas });
     } catch (error) {
         res.status(500).json({ success: false, mensaje: 'Error al obtener preguntas', error: error.message });
